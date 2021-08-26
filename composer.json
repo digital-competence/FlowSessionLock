@@ -1,7 +1,21 @@
 {
     "name": "digicomp/flowsessionlock",
-    "description": "Sesion locking for Neos Flow",
     "type": "neos-package",
+    "description": "Sesion locking for Neos Flow - it secures the session becoming corrupted by concurrent access to the same session by different requests",
+    "keywords": [
+        "flow",
+        "neos"
+    ],
+    "authors": [
+        {
+            "name": "Ferdinand Kuhl",
+            "email": "f.kuhl@digital-competence.de",
+            "homepage": "http://www.digital-competence.de",
+            "role": "Developer"
+        }
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/digicomp/DigiComp.FlowSessionLock",
     "require": {
         "neos/flow": "^6.2",
         "php": "^7.4",
