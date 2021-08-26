@@ -1,0 +1,3 @@
+DigiComp:
+  FlowSessionLock:
+    lockStoreDir: '%FLOW_PATH_DATA%Temporary/Development/SessionLocks'

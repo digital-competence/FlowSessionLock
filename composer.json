@@ -1,0 +1,23 @@
+{
+    "name": "digicomp/flowsessionlock",
+    "description": "Sesion locking for Neos Flow",
+    "type": "neos-package",
+    "require": {
+        "neos/flow": "^6.2",
+        "php": "^7.4",
+        "symfony/lock": "^5.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "DigiComp\\FlowSessionLock\\": "Classes/"
+        }
+    },
+    "extra": {
+        "neos": {
+            "package-key": "DigiComp.FlowSessionLock"
+        },
+        "branch-alias": {
+            "dev-develop": "1.0.x-dev"
+        }
+    }
+}

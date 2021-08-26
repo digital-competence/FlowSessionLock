@@ -1,0 +1,12 @@
+DigiComp.FlowSessionLock:LockFactory:
+  className: 'Symfony\Component\Lock\LockFactory'
+  arguments:
+    1:
+      object: 'DigiComp.FlowSessionLock:LockStore'
+
+DigiComp.FlowSessionLock:LockStore:
+  className: 'Symfony\Component\Lock\Store\FlockStore'
+  scope: 'singleton'
+  arguments:
+    1:
+      setting: 'DigiComp.FlowSessionLock.lockStoreDir'
