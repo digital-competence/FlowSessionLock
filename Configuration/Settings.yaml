@@ -12,3 +12,5 @@ DigiComp:
   FlowSessionLock:
     lockStoreDir: '%FLOW_PATH_DATA%Temporary/Production/SessionLocks'
     readOnlyExpressions: []
+    autoRelease: true
+    timeToLive: 300

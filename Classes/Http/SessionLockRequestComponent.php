@@ -32,6 +32,18 @@ class SessionLockRequestComponent implements ComponentInterface
     protected $lockFactory;
 
     /**
+     * @Flow\InjectConfiguration(package="DigiComp.FlowSessionLock", path="autoRelease")
+     * @var bool
+     */
+    protected bool $autoRelease;
+
+    /**
+     * @Flow\InjectConfiguration(package="DigiComp.FlowSessionLock", path="timeToLive")
+     * @var int
+     */
+    protected int $timeToLive;
+
+    /**
      * @inheritDoc
      */
     public function handle(ComponentContext $componentContext)
@@ -50,7 +62,7 @@ class SessionLockRequestComponent implements ComponentInterface
             'session-' . $sessionIdentifier
         ); //TODO: sessionIdentifier might be wrong, probably it should probably be storage identifier
 
-        $lock = $this->lockFactory->createLockFromKey($key, 300, false);
+        $lock = $this->lockFactory->createLockFromKey($key, $this->timeToLive, $this->autoRelease);
 
         $componentContext->setParameter(SessionLockRequestComponent::class, 'sessionLock', $lock);
 
