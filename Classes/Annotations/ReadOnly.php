@@ -4,7 +4,7 @@ namespace DigiComp\FlowSessionLock\Annotations;
 
 /**
  * @Annotation
- * @Target("METHOD")
+ * @Target({"METHOD"})
  */
 final class ReadOnly
 {

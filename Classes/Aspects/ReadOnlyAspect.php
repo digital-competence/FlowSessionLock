@@ -36,37 +36,43 @@ class ReadOnlyAspect
     /**
      * @Flow\Around("methodAnnotatedWith(DigiComp\FlowSessionLock\Annotations\ReadOnly) || filter(DigiComp\FlowSessionLock\Aspects\ReadOnlyFilter)")
      * @param JoinPointInterface $joinPoint
-     *
-     * @return void
+     * @return mixed
      */
     public function demoteLockToReadOnly(JoinPointInterface $joinPoint)
     {
-        $handler = $this->bootstrap->getActiveRequestHandler();
-        if (! $handler instanceof HttpRequestHandlerInterface) {
-            $this->logger->debug(\get_class($handler));
+        $activeRequestHandler = $this->bootstrap->getActiveRequestHandler();
+        if (!$activeRequestHandler instanceof HttpRequestHandlerInterface) {
+            $this->logger->debug('SessionLock: ' . \get_class($activeRequestHandler));
+
             return $joinPoint->getAdviceChain()->proceed($joinPoint);
         }
-        $componentContext = $handler->getComponentContext();
-        /** @var Lock $lock */
-        $lock = $componentContext->getParameter(SessionLockRequestComponent::class, 'sessionLock');
+
         $this->readOnly = true;
-        if ($lock) {
-            $this->logger->debug('SessionLock: Release, as this is marked read only');
+
+        /** @var Lock|null $lock */
+        $lock = $activeRequestHandler->getComponentContext()->getParameter(
+            SessionLockRequestComponent::class,
+            SessionLockRequestComponent::PARAMETER_NAME
+        );
+        if ($lock !== null) {
+            $this->logger->debug('SessionLock: Release, as this is marked read only.');
             $lock->release();
         }
+
         return $joinPoint->getAdviceChain()->proceed($joinPoint);
     }
 
     /**
      * @Flow\Around("method(Neos\Flow\Session\Session->shutdownObject())")
-     *
      * @param JoinPointInterface $joinPoint
+     * @return mixed|void
      */
     public function doNotSaveSession(JoinPointInterface $joinPoint)
     {
         if ($this->readOnly) {
             return;
         }
-        $joinPoint->getAdviceChain()->proceed($joinPoint);
+
+        return $joinPoint->getAdviceChain()->proceed($joinPoint);
     }
 }

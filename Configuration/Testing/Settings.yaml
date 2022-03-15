@@ -1,0 +1,3 @@
+DigiComp:
+  FlowSessionLock:
+    lockStoreConnection: "flock://%FLOW_PATH_DATA%Temporary/Testing/SessionLocks/"
