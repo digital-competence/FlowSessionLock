@@ -3,7 +3,7 @@
     "description": "Session locking for Neos Flow - it secures the session becoming corrupted by concurrent access to the same session by different requests",
     "type": "neos-package",
     "require": {
-        "neos/flow": "^6.2.0",
+        "neos/flow": "^6.3.0",
         "php": ">=7.4",
         "symfony/lock": "^5.2.0"
     },
