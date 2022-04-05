@@ -46,7 +46,7 @@ class SessionLockRequestComponent implements ComponentInterface
     /**
      * @inheritDoc
      */
-    public function handle(ComponentContext $componentContext)
+    public function handle(ComponentContext $componentContext): void
     {
         $sessionCookieName = $this->sessionSettings['name'];
 
