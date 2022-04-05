@@ -14,10 +14,10 @@ class SessionLockRequestComponent implements ComponentInterface
     public const PARAMETER_NAME = 'sessionLock';
 
     /**
-     * @Flow\Inject(lazy=false)
+     * @Flow\Inject
      * @var LoggerInterface
      */
-    protected LoggerInterface $logger;
+    protected $logger;
 
     /**
      * @Flow\Inject(name="DigiComp.FlowSessionLock:LockFactory")
