@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DigiComp\FlowSessionLock\Aspects;
 
 use Neos\Flow\Annotations as Flow;
