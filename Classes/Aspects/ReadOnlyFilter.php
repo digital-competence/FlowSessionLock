@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DigiComp\FlowSessionLock\Aspects;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Aop\Builder\ClassNameIndex;
+use Neos\Flow\Aop\Exception as NeosFlowAopException;
+use Neos\Flow\Aop\Exception\InvalidPointcutExpressionException;
 use Neos\Flow\Aop\Pointcut\PointcutFilterComposite;
 use Neos\Flow\Aop\Pointcut\PointcutFilterInterface;
 use Neos\Flow\Configuration\ConfigurationManager;
+use Neos\Flow\Configuration\Exception\InvalidConfigurationTypeException;
 use Neos\Flow\Security\Authorization\Privilege\Method\MethodTargetExpressionParser;
 
 /**
@@ -15,20 +20,32 @@ use Neos\Flow\Security\Authorization\Privilege\Method\MethodTargetExpressionPars
  */
 class ReadOnlyFilter implements PointcutFilterInterface
 {
+    /**
+     * @var ConfigurationManager
+     */
     protected ConfigurationManager $configurationManager;
 
+    /**
+     * @var MethodTargetExpressionParser
+     */
     protected MethodTargetExpressionParser $methodTargetExpressionParser;
 
     /**
      * @var PointcutFilterComposite[]
      */
-    protected ?array $filters = null;
+    protected ?array $pointcutFilterComposites = null;
 
+    /**
+     * @param ConfigurationManager $configurationManager
+     */
     public function injectConfigurationManager(ConfigurationManager $configurationManager): void
     {
         $this->configurationManager = $configurationManager;
     }
 
+    /**
+     * @param MethodTargetExpressionParser $methodTargetExpressionParser
+     */
     public function injectMethodTargetExpressionParser(MethodTargetExpressionParser $methodTargetExpressionParser): void
     {
         $this->methodTargetExpressionParser = $methodTargetExpressionParser;
@@ -36,30 +53,28 @@ class ReadOnlyFilter implements PointcutFilterInterface
 
     /**
      * @inheritDoc
+     * @throws InvalidConfigurationTypeException
+     * @throws InvalidPointcutExpressionException
+     * @throws NeosFlowAopException
      */
     public function matches($className, $methodName, $methodDeclaringClassName, $pointcutQueryIdentifier): bool
     {
-        if ($this->filters === null) {
-            $this->buildPointcutFilters();
-        }
+        $this->buildPointcutFilters();
 
-        $matchingFilters = \array_filter(
-            $this->filters,
-            function (PointcutFilterInterface $filter) use (
-                $className,
-                $methodName,
-                $methodDeclaringClassName,
-                $pointcutQueryIdentifier
-            ): bool {
-                return $filter->matches($className, $methodName, $methodDeclaringClassName, $pointcutQueryIdentifier);
+        foreach ($this->pointcutFilterComposites as $pointcutFilterComposite) {
+            if (
+                $pointcutFilterComposite->matches(
+                    $className,
+                    $methodName,
+                    $methodDeclaringClassName,
+                    $pointcutQueryIdentifier
+                )
+            ) {
+                return true;
             }
-        );
-
-        if ($matchingFilters === []) {
-            return false;
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -80,33 +95,47 @@ class ReadOnlyFilter implements PointcutFilterInterface
 
     /**
      * @inheritDoc
+     * @throws InvalidConfigurationTypeException
+     * @throws InvalidPointcutExpressionException
+     * @throws NeosFlowAopException
      */
     public function reduceTargetClassNames(ClassNameIndex $classNameIndex): ClassNameIndex
     {
-        if ($this->filters === null) {
-            $this->buildPointcutFilters();
-        }
+        $this->buildPointcutFilters();
 
         $result = new ClassNameIndex();
-        foreach ($this->filters as $filter) {
-            $result->applyUnion($filter->reduceTargetClassNames($classNameIndex));
+
+        foreach ($this->pointcutFilterComposites as $pointcutFilterComposite) {
+            $result->applyUnion($pointcutFilterComposite->reduceTargetClassNames($classNameIndex));
         }
+
         return $result;
     }
 
+    /**
+     * @throws InvalidConfigurationTypeException
+     * @throws InvalidPointcutExpressionException
+     * @throws NeosFlowAopException
+     */
     protected function buildPointcutFilters(): void
     {
-        $this->filters = [];
-        $readOnlyExpressions = $this->configurationManager->getConfiguration(
-            ConfigurationManager::CONFIGURATION_TYPE_SETTINGS,
-            'DigiComp.FlowSessionLock.readOnlyExpressions'
-        ) ?? [];
-        foreach ($readOnlyExpressions as $key => $pointcut) {
-            if ($pointcut === null) {
+        if ($this->pointcutFilterComposites !== null) {
+            return;
+        }
+
+        $this->pointcutFilterComposites = [];
+        foreach (
+            $this->configurationManager->getConfiguration(
+                ConfigurationManager::CONFIGURATION_TYPE_SETTINGS,
+                'DigiComp.FlowSessionLock.readOnlyExpressions'
+            ) as $key => $pointcutExpression
+        ) {
+            if ($pointcutExpression === null) {
                 continue;
             }
-            $this->filters[] = $this->methodTargetExpressionParser->parse(
-                $pointcut,
+
+            $this->pointcutFilterComposites[] = $this->methodTargetExpressionParser->parse(
+                $pointcutExpression,
                 'Settings.yaml at "DigiComp.FlowSessionLock.readOnlyExpressions", key: "' . $key . '"'
             );
         }
