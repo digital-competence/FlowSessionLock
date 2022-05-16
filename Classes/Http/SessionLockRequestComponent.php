@@ -73,14 +73,14 @@ class SessionLockRequestComponent implements ComponentInterface
 
         $this->logger->debug('SessionLock: Try to get "' . $key . '"');
         $timedOut = \time() + $this->secondsToWait;
-        while (!$lock->acquire() || $timedOut <= \time()) {
+        while (!$lock->acquire()) {
             \usleep(100000);
-        }
-        if (!$lock->isAcquired()) {
-            throw new LockAcquiringException(
-                'Could not acquire the lock for "' . $key . '" in ' . $this->secondsToWait . ' seconds.',
-                1652687960
-            );
+            if (\time() >= $timedOut) {
+                throw new LockAcquiringException(
+                    'Could not acquire the lock for "' . $key . '" in ' . $this->secondsToWait . ' seconds.',
+                    1652687960
+                );
+            }
         }
         $this->logger->debug('SessionLock: Acquired "' . $key . '"');
     }
