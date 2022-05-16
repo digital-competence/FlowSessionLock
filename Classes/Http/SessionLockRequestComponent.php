@@ -8,6 +8,7 @@ use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Http\Component\ComponentContext;
 use Neos\Flow\Http\Component\ComponentInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\LockFactory;
 
@@ -46,6 +47,12 @@ class SessionLockRequestComponent implements ComponentInterface
     protected bool $autoRelease;
 
     /**
+     * @Flow\InjectConfiguration(package="DigiComp.FlowSessionLock", path="secondsToWait")
+     * @var int
+     */
+    protected int $secondsToWait;
+
+    /**
      * @inheritDoc
      */
     public function handle(ComponentContext $componentContext): void
@@ -64,8 +71,17 @@ class SessionLockRequestComponent implements ComponentInterface
 
         $componentContext->setParameter(SessionLockRequestComponent::class, static::PARAMETER_NAME, $lock);
 
-        $this->logger->debug('SessionLock: Get ' . $key);
-        $lock->acquire(true);
-        $this->logger->debug('SessionLock: Acquired ' . $key);
+        $this->logger->debug('SessionLock: Try to get "' . $key . '"');
+        $timedOut = \time() + $this->secondsToWait;
+        while (!$lock->acquire() || $timedOut <= \time()) {
+            \usleep(100000);
+        }
+        if (!$lock->isAcquired()) {
+            throw new LockAcquiringException(
+                'Could not acquire the lock for "' . $key . '" in ' . $this->secondsToWait . ' seconds.',
+                1652687960
+            );
+        }
+        $this->logger->debug('SessionLock: Acquired "' . $key . '"');
     }
 }

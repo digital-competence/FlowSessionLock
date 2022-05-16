@@ -3,6 +3,7 @@ DigiComp:
     lockStoreConnection: "flock://%FLOW_PATH_DATA%Temporary/Production/SessionLocks/"
     timeToLive: 300.0
     autoRelease: true
+    secondsToWait: 30
     readOnlyExpressions: {}
 
 Neos:
