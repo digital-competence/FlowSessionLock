@@ -7,6 +7,9 @@
         "php": ">=7.4",
         "symfony/lock": "^5.2.0"
     },
+    "require-dev": {
+        "ext-pcntl": "*"
+    },
     "autoload": {
         "psr-4": {
             "DigiComp\\FlowSessionLock\\": "Classes/"
