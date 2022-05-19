@@ -9,9 +9,7 @@ DigiComp:
 Neos:
   Flow:
     http:
-      chain:
-        preprocess:
-          chain:
-            lockSession:
-              position: "before getSessionCookieFromRequest"
-              component: "DigiComp\\FlowSessionLock\\Http\\SessionLockRequestComponent"
+      middlewares:
+        lockSession:
+          position: "before session"
+          middleware: "DigiComp\\FlowSessionLock\\Http\\SessionLockRequestMiddleware"

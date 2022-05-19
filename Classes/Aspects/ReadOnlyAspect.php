@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DigiComp\FlowSessionLock\Aspects;
 
-use DigiComp\FlowSessionLock\Http\SessionLockRequestComponent;
+use DigiComp\FlowSessionLock\Http\SessionLockRequestMiddleware;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Aop\JoinPointInterface;
 use Neos\Flow\Core\Bootstrap;
@@ -52,9 +52,8 @@ class ReadOnlyAspect
         $this->readOnly = true;
 
         /** @var Lock|null $lock */
-        $lock = $activeRequestHandler->getComponentContext()->getParameter(
-            SessionLockRequestComponent::class,
-            SessionLockRequestComponent::PARAMETER_NAME
+        $lock = $activeRequestHandler->getHttpRequest()->getAttribute(
+            SessionLockRequestMiddleware::class . '.' . SessionLockRequestMiddleware::PARAMETER_NAME
         );
         if ($lock !== null) {
             $this->logger->debug('SessionLock: Release, as this is marked read only.');
