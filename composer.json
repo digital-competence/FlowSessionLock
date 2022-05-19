@@ -24,7 +24,8 @@
         },
         "applied-flow-migrations": [
             "Neos.SwiftMailer-20161130105617",
-            "Neos.Flow-20180415105700"
+            "Neos.Flow-20180415105700",
+            "Neos.Flow-20190425144900"
         ]
     },
     "authors": [
