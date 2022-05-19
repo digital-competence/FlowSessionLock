@@ -21,7 +21,10 @@
         },
         "branch-alias": {
             "dev-develop": "2.0.x-dev"
-        }
+        },
+        "applied-flow-migrations": [
+            "Neos.SwiftMailer-20161130105617"
+        ]
     },
     "authors": [
         {
