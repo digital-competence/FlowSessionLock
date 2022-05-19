@@ -23,7 +23,8 @@
             "dev-develop": "2.0.x-dev"
         },
         "applied-flow-migrations": [
-            "Neos.SwiftMailer-20161130105617"
+            "Neos.SwiftMailer-20161130105617",
+            "Neos.Flow-20180415105700"
         ]
     },
     "authors": [
