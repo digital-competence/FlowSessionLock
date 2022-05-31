@@ -14,6 +14,7 @@ use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\LockFactory;
 
+
 class SessionLockRequestMiddleware implements MiddlewareInterface
 {
     public const PARAMETER_NAME = 'sessionLock';
@@ -71,7 +72,7 @@ class SessionLockRequestMiddleware implements MiddlewareInterface
 
         $lock = $this->lockFactory->createLockFromKey($key, $this->timeToLive, $this->autoRelease);
 
-        $request = $request->withAttribute(static::class . '.' . static::PARAMETER_NAME, $lock);
+        $request = $request->withAttribute(SessionLockRequestMiddleware::class . '.' . static::PARAMETER_NAME, $lock);
 
         $this->logger->debug('SessionLock: Try to get "' . $key . '"');
         $timedOut = \time() + $this->secondsToWait;
