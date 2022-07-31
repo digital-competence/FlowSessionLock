@@ -43,16 +43,16 @@ class SessionLockRequestComponentTest extends FunctionalTestCase
                 function ($allRequests, $oneRequest) {
                     self::assertGreaterThan(ExampleController::CONTROLLER_TIME, $oneRequest * 1000);
                     self::assertGreaterThan(ExampleController::CONTROLLER_TIME * 4, $allRequests * 1000);
-                }
+                },
             ],
             [
                 'http://localhost/test/sessionlock/unprotectedbyannotation',
-                $parallelChecker
+                $parallelChecker,
             ],
             [
                 'http://localhost/test/sessionlock/unprotectedbyconfiguration',
-                $parallelChecker
-            ]
+                $parallelChecker,
+            ],
         ];
     }
 
@@ -64,16 +64,16 @@ class SessionLockRequestComponentTest extends FunctionalTestCase
     {
         $request = $this->serverRequestFactory
             ->createServerRequest('GET', new Uri($url));
-        $start = microtime(true);
+        $start = \microtime(true);
         $response = $this->browser->sendRequest($request);
-        $neededForOne = microtime(true) - $start;
+        $neededForOne = \microtime(true) - $start;
 
-        $sessionCookies = array_map(static function ($cookie) {
+        $sessionCookies = \array_map(static function ($cookie) {
             return Cookie::createFromRawSetCookieHeader($cookie);
         }, $response->getHeader('Set-Cookie'));
         self::assertNotEmpty($sessionCookies);
 
-        $cookies = array_reduce($sessionCookies, static function ($out, $cookie) {
+        $cookies = \array_reduce($sessionCookies, static function ($out, $cookie) {
             $out[$cookie->getName()] = $cookie->getValue();
             return $out;
         }, []);
@@ -81,7 +81,7 @@ class SessionLockRequestComponentTest extends FunctionalTestCase
             ->createServerRequest('GET', new Uri($url))
             ->withCookieParams($cookies);
         $childs = [];
-        $start = microtime(true);
+        $start = \microtime(true);
         for ($i = 0; $i < 4; $i++) {
             $child = \pcntl_fork();
             if ($child === 0) {
@@ -93,7 +93,7 @@ class SessionLockRequestComponentTest extends FunctionalTestCase
         foreach ($childs as $child) {
             \pcntl_waitpid($child, $status);
         }
-        $neededForAll = microtime(true) - $start;
+        $neededForAll = \microtime(true) - $start;
 
         $checker($neededForAll, $neededForOne);
     }

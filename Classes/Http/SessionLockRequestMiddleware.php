@@ -14,7 +14,6 @@ use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\LockFactory;
 
-
 class SessionLockRequestMiddleware implements MiddlewareInterface
 {
     public const PARAMETER_NAME = 'sessionLock';
