@@ -4,7 +4,6 @@ namespace DigiComp\FlowSessionLock\Tests\Functional;
 
 use DigiComp\FlowSessionLock\Tests\Functional\Fixtures\Controller\ExampleController;
 use GuzzleHttp\Psr7\Uri;
-use Neos\Flow\Composer\ComposerUtility;
 use Neos\Flow\Http\Cookie;
 use Neos\Flow\Mvc\Routing\Route;
 use Neos\Flow\Tests\FunctionalTestCase;
