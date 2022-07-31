@@ -4,6 +4,7 @@ namespace DigiComp\FlowSessionLock\Tests\Functional;
 
 use DigiComp\FlowSessionLock\Tests\Functional\Fixtures\Controller\ExampleController;
 use GuzzleHttp\Psr7\Uri;
+use Neos\Flow\Composer\ComposerUtility;
 use Neos\Flow\Http\Cookie;
 use Neos\Flow\Mvc\Routing\Route;
 use Neos\Flow\Tests\FunctionalTestCase;
@@ -62,6 +63,9 @@ class SessionLockRequestComponentTest extends FunctionalTestCase
      */
     public function itDoesNotAllowToEnterMoreThanOneWithTheSameSession(string $url, \Closure $checker): void
     {
+        // Functional tests are currently broken, until a version containing
+        // https://github.com/neos/flow-development-collection/commit/bebfc4e6566bc4ba2ba28330344105adb2d6ada0
+        // gets released
         $request = $this->serverRequestFactory
             ->createServerRequest('GET', new Uri($url));
         $start = \microtime(true);
