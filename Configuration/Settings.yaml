@@ -1,16 +1,15 @@
+DigiComp:
+  FlowSessionLock:
+    lockStoreConnection: "flock://%FLOW_PATH_DATA%Temporary/Production/SessionLocks/"
+    timeToLive: 300.0
+    autoRelease: true
+    secondsToWait: 30
+    readOnlyExpressions: {}
+
 Neos:
   Flow:
     http:
-      chain:
-        preprocess:
-          chain:
-            lockSession:
-              position: 'before getSessionCookieFromRequest'
-              component: 'DigiComp\FlowSessionLock\Http\SessionLockRequestComponent'
-
-DigiComp:
-  FlowSessionLock:
-    lockStoreDir: '%FLOW_PATH_DATA%Temporary/Production/SessionLocks'
-    readOnlyExpressions: []
-    autoRelease: true
-    timeToLive: 300
+      middlewares:
+        lockSession:
+          position: "before session"
+          middleware: "DigiComp\\FlowSessionLock\\Http\\SessionLockRequestMiddleware"

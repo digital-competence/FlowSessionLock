@@ -1,25 +1,14 @@
 {
     "name": "digicomp/flowsessionlock",
+    "description": "Session locking for Neos Flow - it secures the session becoming corrupted by concurrent access to the same session by different requests",
     "type": "neos-package",
-    "description": "Sesion locking for Neos Flow - it secures the session becoming corrupted by concurrent access to the same session by different requests",
-    "keywords": [
-        "flow",
-        "neos"
-    ],
-    "authors": [
-        {
-            "name": "Ferdinand Kuhl",
-            "email": "f.kuhl@digital-competence.de",
-            "homepage": "http://www.digital-competence.de",
-            "role": "Developer"
-        }
-    ],
-    "license": "MIT",
-    "homepage": "https://github.com/digicomp/DigiComp.FlowSessionLock",
     "require": {
-        "neos/flow": "^6.2",
-        "php": "^7.4",
-        "symfony/lock": "^5.2"
+        "neos/flow": "^7.3.0",
+        "php": ">=7.4",
+        "symfony/lock": "^5.2.0"
+    },
+    "require-dev": {
+        "ext-pcntl": "*"
     },
     "autoload": {
         "psr-4": {
@@ -31,7 +20,32 @@
             "package-key": "DigiComp.FlowSessionLock"
         },
         "branch-alias": {
-            "dev-develop": "1.0.x-dev"
+            "dev-develop": "3.0.x-dev"
+        },
+        "applied-flow-migrations": [
+            "Neos.SwiftMailer-20161130105617",
+            "Neos.Flow-20180415105700",
+            "Neos.Flow-20190425144900",
+            "Neos.Flow-20190515215000",
+            "Neos.Flow-20200813181400",
+            "Neos.Flow-20201003165200",
+            "Neos.Flow-20201109224100",
+            "Neos.Flow-20201205172733",
+            "Neos.Flow-20201207104500"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Ferdinand Kuhl",
+            "email": "f.kuhl@digital-competence.de",
+            "homepage": "https://www.digital-competence.de",
+            "role": "Developer"
         }
-    }
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/digital-competence/FlowSessionLock",
+    "keywords": [
+        "Neos",
+        "Flow"
+    ]
 }
