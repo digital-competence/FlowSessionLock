@@ -1,26 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DigiComp\FlowSessionLock\Http;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Http\Component\ComponentContext;
 use Neos\Flow\Http\Component\ComponentInterface;
-use Neos\Flow\Utility\Environment;
-use Neos\Utility\Files;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\LockFactory;
 
 class SessionLockRequestComponent implements ComponentInterface
 {
-    /**
-     * @Flow\InjectConfiguration(package="Neos.Flow", path="session")
-     * @var array
-     */
-    protected $sessionSettings;
+    public const PARAMETER_NAME = 'sessionLock';
 
     /**
-     * @Flow\Inject(lazy=false)
+     * @Flow\Inject
      * @var LoggerInterface
      */
     protected $logger;
@@ -32,42 +29,59 @@ class SessionLockRequestComponent implements ComponentInterface
     protected $lockFactory;
 
     /**
+     * @Flow\InjectConfiguration(package="Neos.Flow", path="session")
+     * @var array
+     */
+    protected array $sessionSettings;
+
+    /**
+     * @Flow\InjectConfiguration(package="DigiComp.FlowSessionLock", path="timeToLive")
+     * @var float
+     */
+    protected float $timeToLive;
+
+    /**
      * @Flow\InjectConfiguration(package="DigiComp.FlowSessionLock", path="autoRelease")
      * @var bool
      */
     protected bool $autoRelease;
 
     /**
-     * @Flow\InjectConfiguration(package="DigiComp.FlowSessionLock", path="timeToLive")
+     * @Flow\InjectConfiguration(package="DigiComp.FlowSessionLock", path="secondsToWait")
      * @var int
      */
-    protected int $timeToLive;
+    protected int $secondsToWait;
 
     /**
      * @inheritDoc
      */
-    public function handle(ComponentContext $componentContext)
+    public function handle(ComponentContext $componentContext): void
     {
         $sessionCookieName = $this->sessionSettings['name'];
-        $request = $componentContext->getHttpRequest();
-        $cookies = $request->getCookieParams();
 
+        $cookies = $componentContext->getHttpRequest()->getCookieParams();
         if (!isset($cookies[$sessionCookieName])) {
             return;
         }
 
-        $sessionIdentifier = $cookies[$sessionCookieName];
-
-        $key = new Key(
-            'session-' . $sessionIdentifier
-        ); //TODO: sessionIdentifier might be wrong, probably it should probably be storage identifier
+        // TODO: sessionIdentifier might be wrong, probably it should probably be storage identifier
+        $key = new Key('session-' . $cookies[$sessionCookieName]);
 
         $lock = $this->lockFactory->createLockFromKey($key, $this->timeToLive, $this->autoRelease);
 
-        $componentContext->setParameter(SessionLockRequestComponent::class, 'sessionLock', $lock);
+        $componentContext->setParameter(SessionLockRequestComponent::class, static::PARAMETER_NAME, $lock);
 
-        $this->logger->debug('SessionLock: Get ' . $key);
-        $lock->acquire(true);
-        $this->logger->debug('SessionLock: Acquired ' . $key);
+        $this->logger->debug('SessionLock: Try to get "' . $key . '"');
+        $timedOut = \time() + $this->secondsToWait;
+        while (!$lock->acquire()) {
+            if (\time() >= $timedOut) {
+                throw new LockAcquiringException(
+                    'Could not acquire the lock for "' . $key . '" in ' . $this->secondsToWait . ' seconds.',
+                    1652687960
+                );
+            }
+            \usleep(100000);
+        }
+        $this->logger->debug('SessionLock: Acquired "' . $key . '"');
     }
 }
