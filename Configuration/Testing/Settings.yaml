@@ -1,3 +1,5 @@
 DigiComp:
   FlowSessionLock:
     lockStoreConnection: "flock://%FLOW_PATH_DATA%Temporary/Testing/SessionLocks/"
+    readOnlyExpressions:
+      TestUnprotected: "method(DigiComp\\FlowSessionLock\\Tests\\Functional\\Fixtures\\Controller\\ExampleController->unprotectedByConfigurationAction())"

@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace DigiComp\FlowSessionLock\Http;
 
 use Neos\Flow\Annotations as Flow;
-use Neos\Flow\Http\Component\ComponentContext;
-use Neos\Flow\Http\Component\ComponentInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\LockFactory;
 
-class SessionLockRequestComponent implements ComponentInterface
+class SessionLockRequestMiddleware implements MiddlewareInterface
 {
     public const PARAMETER_NAME = 'sessionLock';
 
@@ -55,13 +57,13 @@ class SessionLockRequestComponent implements ComponentInterface
     /**
      * @inheritDoc
      */
-    public function handle(ComponentContext $componentContext): void
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $sessionCookieName = $this->sessionSettings['name'];
 
-        $cookies = $componentContext->getHttpRequest()->getCookieParams();
+        $cookies = $request->getCookieParams();
         if (!isset($cookies[$sessionCookieName])) {
-            return;
+            return $handler->handle($request);
         }
 
         // TODO: sessionIdentifier might be wrong, probably it should probably be storage identifier
@@ -69,7 +71,7 @@ class SessionLockRequestComponent implements ComponentInterface
 
         $lock = $this->lockFactory->createLockFromKey($key, $this->timeToLive, $this->autoRelease);
 
-        $componentContext->setParameter(SessionLockRequestComponent::class, static::PARAMETER_NAME, $lock);
+        $request = $request->withAttribute(SessionLockRequestMiddleware::class . '.' . static::PARAMETER_NAME, $lock);
 
         $this->logger->debug('SessionLock: Try to get "' . $key . '"');
         $timedOut = \time() + $this->secondsToWait;
@@ -83,5 +85,6 @@ class SessionLockRequestComponent implements ComponentInterface
             \usleep(100000);
         }
         $this->logger->debug('SessionLock: Acquired "' . $key . '"');
+        return $handler->handle($request);
     }
 }
