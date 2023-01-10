@@ -22,7 +22,7 @@ class ExampleController extends ActionController
 
     /**
      * @Flow\Session(autoStart=true);
-     * @FlowSessionLock\ReadOnly
+     * @FlowSessionLock\Unlock
      * @return string
      */
     public function unprotectedByAnnotationAction()

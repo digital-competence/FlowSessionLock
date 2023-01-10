@@ -5,10 +5,13 @@ workspace:
 matrix:
   FLOW_VERSION:
     - 7.3
+  PHP_VERSION:
+    - 7.4
+    - 8.1
 
 pipeline:
   functional-tests:
-    image: thecodingmachine/php:7.4-v4-cli
+    image: "thecodingmachine/php:${PHP_VERSION}-v4-cli"
     environment:
       # Enable the PDO_SQLITE extension
       - "PHP_EXTENSION_PDO_SQLITE=1"

@@ -8,6 +8,7 @@ namespace DigiComp\FlowSessionLock\Annotations;
  * @Annotation
  * @Target({"METHOD"})
  */
-final class ReadOnly
+#[\Attribute(\Attribute::TARGET_METHOD)]
+final class Unlock
 {
 }
