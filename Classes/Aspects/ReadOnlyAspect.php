@@ -36,7 +36,7 @@ class ReadOnlyAspect
     protected bool $readOnly = false;
 
     /**
-     * @Flow\Around("methodAnnotatedWith(DigiComp\FlowSessionLock\Annotations\ReadOnly) || filter(DigiComp\FlowSessionLock\Aspects\ReadOnlyFilter)")
+     * @Flow\Around("methodAnnotatedWith(DigiComp\FlowSessionLock\Annotations\Unlock) || filter(DigiComp\FlowSessionLock\Aspects\ReadOnlyFilter)")
      * @param JoinPointInterface $joinPoint
      * @return mixed
      */

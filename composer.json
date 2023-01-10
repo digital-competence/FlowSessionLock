@@ -4,7 +4,7 @@
     "type": "neos-package",
     "require": {
         "neos/flow": "^7.3.0",
-        "php": ">=7.4",
+        "php": ">=8.1",
         "symfony/lock": "^5.2.0"
     },
     "require-dev": {
@@ -20,7 +20,7 @@
             "package-key": "DigiComp.FlowSessionLock"
         },
         "branch-alias": {
-            "dev-develop": "3.0.x-dev",
+            "dev-develop": "4.0.x-dev",
             "dev-version/2.x-dev": "2.1.x-dev"
         },
         "applied-flow-migrations": [
