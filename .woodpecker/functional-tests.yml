@@ -11,7 +11,7 @@ matrix:
 
 pipeline:
   functional-tests:
-    image: thecodingmachine/php:$PHP_VERSION-v4-cli
+    image: "thecodingmachine/php:${PHP_VERSION}-v4-cli"
     environment:
       # Enable the PDO_SQLITE extension
       - "PHP_EXTENSION_PDO_SQLITE=1"
