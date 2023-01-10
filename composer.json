@@ -5,7 +5,7 @@
     "require": {
         "neos/flow": "^7.3.0",
         "php": "^7.4 | ^8.1",
-        "symfony/lock": "^5.2.0"
+        "symfony/lock": "^5.2.0 | ^6.2.0"
     },
     "require-dev": {
         "ext-pcntl": "*"
